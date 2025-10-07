@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Love Letter 💕</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url("image/bg.jpg") no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* Background transisi */
+    #bgTransition{
+      position:fixed; inset:0; z-index:-1;
+      background-size:cover; background-position:center;
+      background-repeat:no-repeat;
+      opacity:0; filter:blur(20px);
+      transition:opacity 0.8s ease, filter 1s ease;
+    }
+    #bgVideo{
+      position:fixed; inset:0; width:100%; height:100%;
+      object-fit:cover; z-index:-2; display:none;
+    }
+    body::before {
+      content:""; position:absolute; inset:0;
+      background:rgba(0,0,0,0.35); z-index:0;
+    }
+
+    .box{
+      position:relative; z-index:1;
+      background: rgba(255,255,255,0.15);
+      padding:25px; border-radius:16px;
+      backdrop-filter: blur(12px);
+      text-align:center; color:#fff;
+      max-width: 600px; width:90%;
+      margin: 40px auto;
+    }
+    .hidden{ display:none; }
+
+    h1,h2{ margin-bottom:15px; font-weight:600; }
+    input{
+      width:90%; padding:12px; margin:10px 0;
+      border:none; border-radius:8px; outline:none;
+    }
+
+    button{
+      background:#ff4d6d; border:none; color:#fff;
+      padding:12px 20px; border-radius:8px;
+      cursor:pointer; font-weight:700;
+      margin:8px; transition:.3s;
+    }
+    button:hover{ background:#e63e5e; }
+
+    .musicBtn,.logoutBtn{
+      margin-top:10px; background:#fff; color:#ff4d6d;
+      padding:10px 18px; border-radius:25px;
+      border:none; font-weight:500; cursor:pointer;
+    }
+    .musicBtn:hover,.logoutBtn:hover{ background:#ffe6eb; color:#e63e5e; }
+
+    .typing{
+      font-size:18px; white-space:pre-line;
+      border-right:2px solid #fff;
+      width:fit-content; margin:0 auto;
+      animation:blink .75s step-end infinite;
+    }
+    @keyframes blink{ from,to{ border-color:transparent; } 50%{ border-color:#fff; } }
+
+    .gallery{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:15px; margin-top:20px;
+      max-height:80vh; overflow-y:auto;
+      padding-right:10px;
+    }
+    .gallery img{
+      width:100%; height:150px; object-fit:cover;
+      border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.3);
+      cursor:pointer; transition:.3s;
+    }
+    .gallery img:hover{ transform:scale(1.05); }
+
+    .videoGallery{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:15px; margin-top:20px;
+    }
+    .videoGallery video{
+      width:100%; height:180px; object-fit:cover;
+      border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.3);
+      background:#000; cursor:pointer;
+    }
+
+    /* Modal */
+    .modal{
+      position:fixed; inset:0; background:rgba(0,0,0,.9);
+      display:flex; justify-content:center; align-items:center;
+      z-index:9999;
+    }
+    .modalContent{
+      max-width:90%; max-height:90%; border-radius:12px;
+      box-shadow:0 4px 20px rgba(0,0,0,.5);
+    }
+    .modalClose, .modalPrev, .modalNext{
+      position:absolute; top:50%; transform:translateY(-50%);
+      background:rgba(255,255,255,0.3); border:none;
+      color:#fff; padding:12px; border-radius:8px;
+      cursor:pointer; font-size:20px;
+    }
+    .modalClose{ top:20px; right:20px; transform:none; }
+    .modalPrev{ left:20px; }
+    .modalNext{ right:20px; }
+  </style>
+</head>
+<body>
+  <div id="bgTransition"></div>
+  <video id="bgVideo" autoplay muted loop></video>
+
+  <!-- Login -->
+  <div class="box" id="loginBox">
+    <h2>Login 💌</h2>
+    <input type="text" id="username" placeholder="Nama"/>
+    <input type="password" id="password" placeholder="Password"/>
+    <button onclick="login()">Masuk</button>
+  </div>
+
+  <!-- Menu -->
+  <div class="box hidden" id="menuBox">
+    <h2>Hai Sayang 💖</h2>
+    <button onclick="showLoveLetter()">Love Letter</button>
+    <button onclick="showGallery()">Gallery</button>
+    <button onclick="showVideo()">Video Kita 🎬</button>
+    <br/>
+    <button class="musicBtn" onclick="toggleMusic()">⏸ Pause Music</button>
+    <button class="logoutBtn" onclick="logout()">🚪 Logout</button>
+  </div>
+
+  <!-- Love Letter -->
+  <div class="box hidden" id="loveLetter">
+    <h1>Untuk Kamu ❤️</h1>
+    <p class="typing" id="message"></p>
+    <br/>
+    <button class="musicBtn" onclick="toggleMusic()">⏸ Pause Music</button>
+    <button class="logoutBtn" onclick="backToMenu()">⬅️ Kembali</button>
+  </div>
+
+  <!-- Gallery -->
+  <div class="box hidden" id="galleryBox">
+    <h2>Galeri Kita 📸</h2>
+    <div class="gallery" id="gallery"></div>
+    <br/>
+    <button class="musicBtn" onclick="toggleMusic()">⏸ Pause Music</button>
+    <button class="logoutBtn" onclick="backToMenu()">⬅️ Kembali</button>
+  </div>
+
+  <!-- Video -->
+  <div class="box hidden" id="videoBox">
+    <h2>Video Kita 🎬</h2>
+    <div class="videoGallery" id="videoGallery"></div>
+    <br/>
+    <button class="musicBtn" onclick="toggleMusic()">⏸ Pause Music</button>
+    <button class="logoutBtn" onclick="backToMenu()">⬅️ Kembali</button>
+  </div>
+
+  <audio id="bgMusic" src="music/music.mp3" preload="auto" loop></audio>
+
+  <script>
+    // ===== Login =====
+    function login(){
+      const u=document.getElementById("username").value.trim();
+      const p=document.getElementById("password").value.trim();
+      if((u.toLowerCase()==="anggreini"||u.toLowerCase()==="fictor")&&p==="300525"){
+        switchBox("loginBox","menuBox"); fadeInMusic();
+      } else alert("Nama atau password salah! 💔");
+    }
+    function logout(){ switchBox("menuBox","loginBox"); fadeOutMusic(); changeBackground("image/bg.jpg"); }
+
+    function backToMenu(){ ["loveLetter","galleryBox","videoBox"].forEach(id=>switchBox(id,"menuBox")); changeBackground("image/bg.jpg"); }
+    function switchBox(hideId,showId){ document.getElementById(hideId).classList.add("hidden"); document.getElementById(showId).classList.remove("hidden"); }
+
+    // ===== Love Letter =====
+    function showLoveLetter(){ switchBox("menuBox","loveLetter"); typeEffect(); }
+
+    // ===== Gallery =====
+    let galleryImages=[]; let currentIndex=0;
+    function showGallery(){
+      switchBox("menuBox","galleryBox");
+      const gallery=document.getElementById("gallery"); gallery.innerHTML="";
+      galleryImages=[];
+      for(let i=1;i<=38;i++){
+        ["png","jpg"].forEach(ext=>{
+          const path=`image/foto${i}.${ext}`;
+          const img=document.createElement("img"); img.src=path;
+          img.onerror=()=>img.remove();
+          img.onclick=()=>openImageModal(i-1, path);
+          gallery.appendChild(img);
+          galleryImages.push(path);
+        });
+      }
+    }
+
+    // ===== Modal dengan Next/Prev =====
+    function openImageModal(index,src){
+      currentIndex=index;
+      const modal=document.createElement("div"); modal.className="modal";
+      modal.innerHTML=`
+        <button class="modalClose">✕</button>
+        <button class="modalPrev">⟨</button>
+        <img src="${src}" class="modalContent" id="modalImg"/>
+        <button class="modalNext">⟩</button>
+      `;
+      modal.querySelector(".modalClose").onclick=()=>modal.remove();
+      modal.querySelector(".modalPrev").onclick=()=>changeModalImage(-1,modal);
+      modal.querySelector(".modalNext").onclick=()=>changeModalImage(1,modal);
+      modal.onclick=(e)=>{ if(e.target===modal) modal.remove(); };
+      document.body.appendChild(modal);
+    }
+    function changeModalImage(step,modal){
+      currentIndex=(currentIndex+step+galleryImages.length)%galleryImages.length;
+      modal.querySelector("#modalImg").src=galleryImages[currentIndex];
+      changeBackground(galleryImages[currentIndex]);
+    }
+
+    // ===== Video =====
+    function showVideo(){
+      switchBox("menuBox","videoBox");
+      const videoGallery=document.getElementById("videoGallery"); videoGallery.innerHTML="";
+      const videos=["video1.mp4","video2.mp4","video3.mp4", "video4.mp4",];
+      videos.forEach((v,i)=>{
+        const vid=document.createElement("video"); vid.src="video/"+v; vid.controls=true;
+        vid.onclick=()=>changeBackground("video/"+v);
+        if(i===0) changeBackground("video/"+v);
+        videoGallery.appendChild(vid);
+      });
+    }
+
+    // ===== Typing effect =====
+    const text="Hai sayang...\nAmsal 31:29\nBanyak wanita telah berbuat baik, tapi kamu melebihi mereka semua ❤️\nI will always love you. 💕";
+    let ti=0; const speed=50; const msg=document.getElementById("message");
+    function typeEffect(){ msg.textContent=""; ti=0; (function typing(){ if(ti<text.length){ msg.textContent+=text.charAt(ti++); setTimeout(typing,speed);} })(); }
+
+    // ===== Music fade =====
+    const music=document.getElementById("bgMusic"); let fadeInterval;
+    function fadeInMusic(){ music.volume=0; music.play().catch(()=>{}); clearInterval(fadeInterval);
+      fadeInterval=setInterval(()=>{ if(music.volume<1){ music.volume=Math.min(music.volume+.05,1);} else clearInterval(fadeInterval); },150);
+      updateMusicBtn("⏸ Pause Music"); }
+    function fadeOutMusic(){ clearInterval(fadeInterval);
+      fadeInterval=setInterval(()=>{ if(music.volume>0){ music.volume=Math.max(music.volume-.05,0);} else{ clearInterval(fadeInterval); music.pause(); }},150);
+      updateMusicBtn("▶️ Play Music"); }
+    function toggleMusic(){ if(music.paused) fadeInMusic(); else fadeOutMusic(); }
+    function updateMusicBtn(t){ document.querySelectorAll(".musicBtn").forEach(b=>b.textContent=t); }
+
+    // ===== Background changer =====
+    function changeBackground(path){
+      const overlay=document.getElementById("bgTransition"), bgVideo=document.getElementById("bgVideo");
+      if(path.endsWith(".mp4")){
+        bgVideo.src=path; bgVideo.style.display="block"; overlay.style.opacity="0";
+        document.body.style.background="none";
+      } else {
+        bgVideo.style.display="none"; overlay.style.backgroundImage=`url("${path}")`; overlay.style.opacity="1"; overlay.style.filter="blur(20px)";
+        setTimeout(()=>{ document.body.style.background=`url("${path}") no-repeat center center fixed`; document.body.style.backgroundSize="cover"; overlay.style.filter="blur(0px)"; overlay.style.opacity="0"; },800);
+      }
+    }
+  </script>
+</body>
+</html>
