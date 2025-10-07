@@ -231,7 +231,7 @@
     function showVideo(){
       switchBox("menuBox","videoBox");
       const videoGallery=document.getElementById("videoGallery"); videoGallery.innerHTML="";
-      const videos=["video1.mp4","video2.mp4","video3.mp4", "video4.mp4",];
+      const videos=["video1.mp4","video2.mp4","video3.mp4",];
       videos.forEach((v,i)=>{
         const vid=document.createElement("video"); vid.src="video/"+v; vid.controls=true;
         vid.onclick=()=>changeBackground("video/"+v);
@@ -270,3 +270,4 @@
   </script>
 </body>
 </html>
+
